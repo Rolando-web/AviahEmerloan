@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settled Loans</title>
+    <link rel="icon" type="image/jpeg" href="/assets/images/aviah.jpg" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style/app.css" />
+  </head>
+  <body class="min-h-screen bg-slate-100">
+    <div class="min-h-screen md:flex">
+      <app-sidebar></app-sidebar>
+
+      <main class="flex-1 p-5 md:p-10">
+        <div class="mx-auto w-full max-w-3xl">
+          <h1 class="text-2xl font-bold text-violet-800">Settled Loans</h1>
+
+          <div class="mt-5 rounded-2xl bg-violet-800 p-6 text-white shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs text-white/70">Total Settled</div>
+                <div id="totalSettled" class="mt-1 text-3xl font-extrabold">0</div>
+              </div>
+              <div class="rounded-full bg-white/15 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 10-1.214-.882l-3.05 4.2-2.035-2.034a.75.75 0 10-1.06 1.06l2.65 2.65a.75.75 0 001.137-.089l3.572-4.905z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-2xl bg-white/10 p-4">
+              <div class="text-xs text-white/70">Total Amount Collected</div>
+              <div id="totalCollected" class="mt-1 text-2xl font-bold">₱0.00</div>
+            </div>
+          </div>
+
+          <div id="paidLoansList" class="mt-5 space-y-4"></div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/scripts/pages/paid.js"></script>
+  </body>
+</html>

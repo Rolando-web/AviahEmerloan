@@ -1,0 +1,10 @@
+/* Small project-specific tweaks (Tailwind does most styling) */
+
+html, body {
+  height: 100%;
+}
+
+/* Helps inputs look consistent across browsers */
+input[type="date"] {
+  color-scheme: light;
+}
