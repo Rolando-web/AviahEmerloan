@@ -1,9 +1,10 @@
 import { initCommonUi } from './common.js';
 import { getLoans, getLoanById, updateLoan, initStorage } from '../storage.js';
-import { inDateRange, todayIso } from '../loanMath.js';
-import { qs, on, setText } from '../dom.js';
+import { inDateRange, todayIso, computeTotals } from '../loanMath.js';
+import { qs, on, setText, showToast } from '../dom.js';
 import { renderActiveLoanCard, renderEmptyState } from '../renderers.js';
 import { ensureEditModalMounted, openEditLoanModal } from './editModal.js';
+import { downloadCsv } from '../csv.js';
 
 function getFilters() {
   const from = qs('#fromDate')?.value || '';
@@ -56,12 +57,43 @@ function handleListClick(e) {
     if (!loan) return;
 
     openEditLoanModal(loan, {
-      onSave: (patch) => {
-        updateLoan(id, patch);
-        render();
+      onSave: async (patch) => {
+        try {
+          await updateLoan(id, patch);
+          render();
+          showToast('Loan updated successfully!');
+        } catch (error) {
+          console.error(error);
+          showToast('Failed to update loan. Check database rules.', 'error');
+        }
       },
     });
   }
+}
+
+function handleExportCsv() {
+  const loans = getFilteredActiveLoans();
+  if (!loans.length) {
+    alert('No active loans to export.');
+    return;
+  }
+
+  const csvData = loans.map(l => {
+    const totals = computeTotals(l);
+    return {
+      "Loan ID": l.id,
+      "Borrower Name": l.borrowerName,
+      "Amount Released": totals.principal.toFixed(2),
+      "Interest Rate (%)": totals.interestRate,
+      "Interest Amount": totals.interest.toFixed(2),
+      "Total Payable": totals.accumulated.toFixed(2),
+      "Due Date": l.dueDate,
+      "Created At": l.createdAt,
+      "Status": "Active"
+    };
+  });
+
+  downloadCsv(csvData, `active_loans_${todayIso()}.csv`);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -78,4 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const el = qs(sel);
     if (el) on(el, 'input', render);
   });
+
+  const exportBtn = qs('#exportCsvBtn');
+  if (exportBtn) on(exportBtn, 'click', handleExportCsv);
 });

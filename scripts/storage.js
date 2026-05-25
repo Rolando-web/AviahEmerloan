@@ -19,10 +19,16 @@ let isLoaded = false;
 
 export async function initStorage() {
   if (isLoaded) return;
-  const snapshot = await getDocs(collection(db, "loans"));
-  cachedLoans = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-  // Sort by createdAt descending initially
-  cachedLoans.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  try {
+    const snapshot = await getDocs(collection(db, "loans"));
+    cachedLoans = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Sort by createdAt descending initially
+    cachedLoans.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch (error) {
+    console.error("Firebase read error. Make sure your Firestore rules allow reads:", error);
+    // If it fails (e.g., rules), just start with empty array so UI doesn't crash
+    cachedLoans = [];
+  }
   isLoaded = true;
 }
 

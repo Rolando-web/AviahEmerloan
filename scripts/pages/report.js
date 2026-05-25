@@ -2,6 +2,7 @@ import { initCommonUi } from './common.js';
 import { getLoans, initStorage } from '../storage.js';
 import { computeTotals, formatCurrency, inDateRange } from '../loanMath.js';
 import { qs, on, setText } from '../dom.js';
+import { downloadCsv } from '../csv.js';
 
 function getFilters() {
   const from = qs('#fromDate')?.value || '';
@@ -162,6 +163,35 @@ function render() {
   renderChart(paidLoans);
 }
 
+function handleExportCsv() {
+  const { from, to } = getFilters();
+  const filteredLoans = getLoans().filter((l) => inDateRange(l.createdAt, from, to));
+
+  if (!filteredLoans.length) {
+    alert('No data matches the current date filter.');
+    return;
+  }
+
+  const csvData = filteredLoans.map(l => {
+    const totals = computeTotals(l);
+    return {
+      "Loan ID": l.id,
+      "Borrower Name": l.borrowerName,
+      "Amount Released": totals.principal.toFixed(2),
+      "Interest Rate (%)": totals.interestRate,
+      "Interest Amount": totals.interest.toFixed(2),
+      "Total Payable": totals.accumulated.toFixed(2),
+      "Created At": l.createdAt,
+      "Due Date": l.dueDate,
+      "Paid At": l.paidAt || '',
+      "Status": l.status.toUpperCase()
+    };
+  });
+
+  const rangeSuffix = from || to ? `_${from || 'start'}_to_${to || 'end'}` : '_all';
+  downloadCsv(csvData, `report_loans${rangeSuffix}.csv`);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
   await initStorage();
@@ -171,4 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const el = qs(sel);
     if (el) on(el, 'input', render);
   });
+
+  const exportBtn = qs('#exportCsvBtn');
+  if (exportBtn) on(exportBtn, 'click', handleExportCsv);
 });

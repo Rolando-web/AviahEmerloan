@@ -1,6 +1,7 @@
 import { initCommonUi } from './common.js';
 import { generateId, upsertLoan, initStorage } from '../storage.js';
 import { normalizeIsoDate, todayIso, toNumber } from '../loanMath.js';
+import { showToast } from '../dom.js';
 
 function wireRateButtons(rateInput, container = document) {
   const buttons = Array.from(container.querySelectorAll('[data-rate]'));
@@ -40,17 +41,24 @@ async function onSubmit(e) {
     return;
   }
 
-  await upsertLoan({
-    id: generateId(),
-    borrowerName,
-    amount,
-    interestRate,
-    dueDate,
-    createdAt: todayIso(),
-    status: 'active',
-  });
-
-  window.location.href = '/views/active/index.html';
+  try {
+    await upsertLoan({
+      id: generateId(),
+      borrowerName,
+      amount,
+      interestRate,
+      dueDate,
+      createdAt: todayIso(),
+      status: 'active',
+    });
+    showToast('Loan created successfully!');
+    setTimeout(() => {
+      window.location.href = '/views/active/index.html';
+    }, 1000); // Give user a moment to see the toast before redirect
+  } catch (error) {
+    console.error('Error creating loan:', error);
+    showToast('Failed to save. Have you enabled Firestore in Test Mode?', 'error');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
