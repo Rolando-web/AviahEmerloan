@@ -16,7 +16,7 @@ export function renderActiveLoanCard(loan) {
   const leftClass = left !== null && left < 0 ? 'bg-rose-100 text-rose-700' : 'bg-violet-100 text-violet-700';
 
   return `
-  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="rounded-2xl border-2 border-violet-800 bg-white p-4 shadow-sm">
     <div class="flex items-start justify-between gap-3">
       <div>
         <div class="text-base font-semibold text-slate-900">${escapeHtml(loan.borrowerName)}</div>
@@ -59,6 +59,13 @@ export function renderActiveLoanCard(loan) {
           <path d="M11.5 5.5l3 3" />
         </svg>
       </button>
+      <button class="rounded-xl border border-slate-200 bg-white p-3 text-red-600 hover:bg-red-50" aria-label="Delete" data-action="deleteActive" data-id="${escapeHtml(loan.id)}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+          <path fill-rule="evenodd" d="M8.5 2a1.5 1.5 0 00-1.5 1.5V4H4.75a.75.75 0 000 1.5h.49l.72 11.02A2.25 2.25 0 008.2 18.75h3.6a2.25 2.25 0 002.24-2.23l.72-11.02h.49a.75.75 0 000-1.5H13v-.5A1.5 1.5 0 0011.5 2h-3zM8.5 4h3V3.5a.5.5 0 00-.5-.5H9a.5.5 0 00-.5.5V4z" clip-rule="evenodd" />
+          <path d="M9 8.25a.75.75 0 01.75.75v6a.75.75 0 01-1.5 0v-6A.75.75 0 019 8.25z" />
+          <path d="M11 8.25a.75.75 0 01.75.75v6a.75.75 0 01-1.5 0v-6a.75.75 0 01.75-.75z" />
+        </svg>
+      </button>
     </div>
   </div>
   `;
@@ -67,7 +74,7 @@ export function renderActiveLoanCard(loan) {
 export function renderPaidLoanCard(loan) {
   const totals = computeTotals(loan);
   return `
-  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="rounded-2xl border-2 border-violet-800 bg-white p-4 shadow-sm">
     <div class="flex items-start justify-between gap-3">
       <div>
         <div class="text-base font-semibold text-slate-900">${escapeHtml(loan.borrowerName)}</div>

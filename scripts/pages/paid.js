@@ -1,7 +1,7 @@
 import { initCommonUi } from './common.js';
 import { deleteLoan, getLoanById, getLoans, initStorage } from '../storage.js';
 import { computeTotals, formatCurrency, todayIso } from '../loanMath.js';
-import { qs, on, setText } from '../dom.js';
+import { qs, on, setText, showToast } from '../dom.js';
 import { renderEmptyState, renderPaidLoanCard } from '../renderers.js';
 import { downloadCsv } from '../csv.js';
 
@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       deleteLoan(id);
       render();
+      showToast('Record deleted successfully!');
     });
   }
 

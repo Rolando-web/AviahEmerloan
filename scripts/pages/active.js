@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { getLoans, getLoanById, updateLoan, initStorage } from '../storage.js';
+import { getLoans, getLoanById, updateLoan, deleteLoan, initStorage } from '../storage.js';
 import { inDateRange, todayIso, computeTotals } from '../loanMath.js';
 import { qs, on, setText, showToast } from '../dom.js';
 import { renderActiveLoanCard, renderEmptyState } from '../renderers.js';
@@ -49,6 +49,18 @@ function handleListClick(e) {
     if (!ok) return;
     updateLoan(id, { status: 'paid', paidAt: todayIso() });
     render();
+    return;
+  }
+
+  if (action === 'deleteActive') {
+    const loan = getLoanById(id);
+    const name = loan?.borrowerName ? ` "${loan.borrowerName}"` : '';
+    const ok = confirm(`Delete active loan for${name}? This cannot be undone.`);
+    if (!ok) return;
+
+    deleteLoan(id);
+    render();
+    showToast('Loan deleted successfully!');
     return;
   }
 

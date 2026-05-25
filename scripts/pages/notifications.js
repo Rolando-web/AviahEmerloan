@@ -1,7 +1,7 @@
 import { initCommonUi } from './common.js';
 import { getLoans, initStorage, updateLoan } from '../storage.js';
 import { daysLeft } from '../loanMath.js';
-import { escapeHtml, qs, on, setText } from '../dom.js';
+import { escapeHtml, qs, on, setText, showToast } from '../dom.js';
 import { renderEmptyState } from '../renderers.js';
 
 function getNearDueLoans() {
@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       await updateLoan(id, { notificationDismissed: true });
       render();
+      showToast('Notification deleted!');
     });
   }
 });
