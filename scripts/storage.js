@@ -1,53 +1,65 @@
-const STORAGE_KEY = 'emerloan.loans.v1';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-function safeJsonParse(value, fallback) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyAjRholwZiXfsUPACtLgdJRzOE1ExwmF_Q",
+  authDomain: "webaviahemerloan.firebaseapp.com",
+  projectId: "webaviahemerloan",
+  storageBucket: "webaviahemerloan.firebasestorage.app",
+  messagingSenderId: "657576512096",
+  appId: "1:657576512096:web:162769ae8910483abed105",
+  measurementId: "G-T3Y3WB31X0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let cachedLoans = [];
+let isLoaded = false;
+
+export async function initStorage() {
+  if (isLoaded) return;
+  const snapshot = await getDocs(collection(db, "loans"));
+  cachedLoans = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  // Sort by createdAt descending initially
+  cachedLoans.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  isLoaded = true;
 }
 
 export function getLoans() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const parsed = safeJsonParse(raw ?? '[]', []);
-  return Array.isArray(parsed) ? parsed : [];
+  return cachedLoans;
 }
 
-export function setLoans(loans) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(loans));
-}
-
-export function upsertLoan(updatedLoan) {
-  const loans = getLoans();
-  const idx = loans.findIndex((l) => l.id === updatedLoan.id);
+export async function upsertLoan(updatedLoan) {
+  const idx = cachedLoans.findIndex((l) => l.id === updatedLoan.id);
   if (idx >= 0) {
-    loans[idx] = updatedLoan;
+    cachedLoans[idx] = updatedLoan;
   } else {
-    loans.unshift(updatedLoan);
+    cachedLoans.unshift(updatedLoan);
   }
-  setLoans(loans);
+  // Sync to Firestore asynchronously
+  await setDoc(doc(db, "loans", updatedLoan.id), updatedLoan);
   return updatedLoan;
 }
 
-export function updateLoan(id, patch) {
-  const loans = getLoans();
-  const idx = loans.findIndex((l) => l.id === id);
+export async function updateLoan(id, patch) {
+  const idx = cachedLoans.findIndex((l) => l.id === id);
   if (idx < 0) return null;
-  loans[idx] = { ...loans[idx], ...patch };
-  setLoans(loans);
-  return loans[idx];
+  cachedLoans[idx] = { ...cachedLoans[idx], ...patch };
+  // Sync to Firestore asynchronously
+  await setDoc(doc(db, "loans", id), cachedLoans[idx]);
+  return cachedLoans[idx];
 }
 
 export function getLoanById(id) {
-  return getLoans().find((l) => l.id === id) ?? null;
+  return cachedLoans.find((l) => l.id === id) ?? null;
 }
 
-export function deleteLoan(id) {
-  const loans = getLoans();
-  const next = loans.filter((l) => l.id !== id);
-  setLoans(next);
-  return next.length !== loans.length;
+export async function deleteLoan(id) {
+  const initialLength = cachedLoans.length;
+  cachedLoans = cachedLoans.filter((l) => l.id !== id);
+  await deleteDoc(doc(db, "loans", id));
+  return cachedLoans.length !== initialLength;
 }
 
 export function generateId() {

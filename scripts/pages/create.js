@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { generateId, upsertLoan } from '../storage.js';
+import { generateId, upsertLoan, initStorage } from '../storage.js';
 import { normalizeIsoDate, todayIso, toNumber } from '../loanMath.js';
 
 function wireRateButtons(rateInput, container = document) {
@@ -26,7 +26,7 @@ function wireRateButtons(rateInput, container = document) {
   setActive(rateInput.value);
 }
 
-function onSubmit(e) {
+async function onSubmit(e) {
   e.preventDefault();
   const form = e.currentTarget;
 
@@ -40,7 +40,7 @@ function onSubmit(e) {
     return;
   }
 
-  upsertLoan({
+  await upsertLoan({
     id: generateId(),
     borrowerName,
     amount,
@@ -53,8 +53,9 @@ function onSubmit(e) {
   window.location.href = '/views/active/index.html';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
+  await initStorage();
 
   const form = document.getElementById('createLoanForm');
   const rateInput = document.getElementById('interestRate');

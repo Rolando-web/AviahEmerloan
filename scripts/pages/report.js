@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { getLoans } from '../storage.js';
+import { getLoans, initStorage } from '../storage.js';
 import { computeTotals, formatCurrency, inDateRange } from '../loanMath.js';
 import { qs, on, setText } from '../dom.js';
 
@@ -162,8 +162,9 @@ function render() {
   renderChart(paidLoans);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
+  await initStorage();
   render();
 
   ['#fromDate', '#toDate'].forEach((sel) => {

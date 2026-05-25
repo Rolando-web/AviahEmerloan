@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { getLoans, getLoanById, updateLoan } from '../storage.js';
+import { getLoans, getLoanById, updateLoan, initStorage } from '../storage.js';
 import { inDateRange, todayIso } from '../loanMath.js';
 import { qs, on, setText } from '../dom.js';
 import { renderActiveLoanCard, renderEmptyState } from '../renderers.js';
@@ -66,6 +66,7 @@ function handleListClick(e) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
+  await initStorage();
   await ensureEditModalMounted();
 
   render();

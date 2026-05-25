@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { getLoans } from '../storage.js';
+import { getLoans, initStorage } from '../storage.js';
 import { daysLeft } from '../loanMath.js';
 import { escapeHtml, qs, setText } from '../dom.js';
 import { renderEmptyState } from '../renderers.js';
@@ -43,7 +43,8 @@ function render() {
   container.innerHTML = loans.map(renderNotificationCard).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
+  await initStorage();
   render();
 });

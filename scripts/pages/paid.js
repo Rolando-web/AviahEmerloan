@@ -1,5 +1,5 @@
 import { initCommonUi } from './common.js';
-import { deleteLoan, getLoanById, getLoans } from '../storage.js';
+import { deleteLoan, getLoanById, getLoans, initStorage } from '../storage.js';
 import { computeTotals, formatCurrency } from '../loanMath.js';
 import { qs, setText } from '../dom.js';
 import { renderEmptyState, renderPaidLoanCard } from '../renderers.js';
@@ -26,8 +26,9 @@ function render() {
   list.innerHTML = loans.map(renderPaidLoanCard).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initCommonUi();
+  await initStorage();
   render();
 
   const list = qs('#paidLoansList');
